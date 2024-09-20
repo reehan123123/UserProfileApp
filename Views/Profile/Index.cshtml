@@ -1,0 +1,103 @@
+﻿@using UserProfileApp.Models
+@model UserProfile
+
+@{
+    ViewData["Title"] = "Your Profile";
+}
+
+<div class="row align-items-center mb-3">
+    <div class="col-8">
+        <h2>Your Profile</h2>
+        <span class="text-success">@TempData["Submitted"]</span>
+    </div>
+    <div class="col-4 text-right">
+        <form asp-action="Logout" asp-controller="Account" method="post" class="d-inline">
+            <button type="submit" class="btn btn-danger">Logout</button>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Profile Information Section -->
+    <div class="col-md-6">
+        <form asp-action="Index" method="post">
+            <input type="hidden" asp-for="UserId" />
+
+            <div class="form-group">
+                <label asp-for="FirstName"></label>
+                <input asp-for="FirstName" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="LastName"></label>
+                <input asp-for="LastName" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="Address"></label>
+                <input asp-for="Address" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="PhoneNumber"></label>
+                <input asp-for="PhoneNumber" class="form-control" />
+                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label>Profile Picture:</label>
+                @if (!string.IsNullOrEmpty(Model.ProfilePicturePath))
+                {
+                    <div>
+                        <img src="@Model.ProfilePicturePath" alt="Profile Picture" style="width: 50px; height: 60px; object-fit: cover;" />
+                    </div>
+                }
+                else
+                {
+                    <p>No profile picture uploaded.</p>
+                }
+            </div>
+
+            <button id="saveButton" type="submit" class="btn btn-outline-primary">
+                Save Profile
+            </button>
+            <br />
+            <span class="text-warning">@TempData["UploadStatus"]</span>
+        </form>
+    </div>
+
+    <!-- Upload Section -->
+    <div class="col-md-6">
+        <!-- Upload Profile Picture -->
+        <form asp-action="UploadProfilePicture" enctype="multipart/form-data" method="post">
+            <div class="form-group">
+                <label for="ProfilePicturePath">Upload Profile Picture</label>
+                <input type="file" name="ProfilePicturePath" class="form-control" accept="image/*" />
+                <span class="text-danger">@TempData["InvalidProfilePic"]</span>
+            </div>
+            <button type="submit" class="btn btn-primary">Upload Profile Picture</button>
+        </form>
+
+        <!-- Upload File -->
+        <form asp-action="UploadFile" enctype="multipart/form-data" method="post">
+            <div class="form-group">
+                <label for="file">Upload File</label>
+                <input type="file" name="file" class="form-control" accept=".pdf, .doc, .docx" />
+                <span class="text-danger">@TempData["InvalidFile"]</span>
+            </div>
+            <button type="submit" class="btn btn-primary">Upload File</button>
+        </form>
+
+        <!-- Display Files -->
+        @if (Model.Files != null && Model.Files.Any())
+        {
+            <h3>Uploaded Files</h3>
+            <ul>
+                @foreach (var file in Model.Files)
+                {
+                    <li>
+                        @file.FileName
+                        <a asp-action="DownloadFile" asp-route-fileName="@file.FileName">Download</a> |
+                        <a asp-action="DeleteFile" asp-route-fileName="@file.FileName">Delete</a>
+                    </li>
+                }
+            </ul>
+        }
+    </div>
+</div>
